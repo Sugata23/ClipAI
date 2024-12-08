@@ -7,7 +7,7 @@ function CreateNew() {
             <h2 className='text-4xl font-bold text-primary text-center'>Create New</h2>
             <div>
                 {/* select topic */}
-                    <SelectTopic />
+                <SelectTopic />
                 {/* select style */}
 
                 {/* select duration */}
