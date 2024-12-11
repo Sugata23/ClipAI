@@ -37,7 +37,6 @@ function SelectTopic({onUserSelect}) {
                 placeholder='Enter your custom prompt here' 
                 className='mt-4'/>
             }
-
         </div>
     )
 }
