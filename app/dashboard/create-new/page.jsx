@@ -6,20 +6,25 @@ import SelectDuration from './_components/SelectDuration';
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import CustomLoading from './_components/CustomLoading';
+import { v4 as uuidv4 } from 'uuid';
 
 function CreateNew() {
     const [formdata, setFormdata] = useState([]);
     const [loading, setLoading] = useState(false);
     const [videoScript, setVideoScript] = useState();
+    const [audioFileURL, setAudioFileURL] = useState();
+    const [audioCaption, setAudioCaption] = useState();
     const onHandleInputChange = (fieldName, fieldValue) => {
-        console.log(fieldName, fieldValue);
+        //console.log(fieldName, fieldValue);
         setFormdata(prev=>({
             ...prev,
             [fieldName]: fieldValue
         }))
     };
     const onClickCreateHandler = () => {
-        GetVideoScript();
+        //GetVideoScript();
+        //GenerateAudioFile()
+        GenerateAudioCaption();
     }
     //get video script from AI model
     const GetVideoScript =async () => {
@@ -29,11 +34,44 @@ function CreateNew() {
         const result=await axios.post('/api/get-video-script',{
             prompt:prompt
         }).then(res=>{
-            console.log(res.data.result);
+            //console.log(res.data.result);
             setVideoScript(res.data.result);
+            GenerateAudioFile(res.data.result);
         })
         setLoading(false);
     }
+
+    //generate audio from video script
+    const GenerateAudioFile=async(videoScriptData)=>{
+        setLoading(true);
+        let script='';
+        const id=uuidv4();
+        videoScriptData.forEach(element => {
+            script+=element.ContentText+' ';
+        });
+        //console.log(script);
+        await axios.post('/api/generate-audio',{
+            text:script,
+            id:id
+        }).then(res=>{
+            //console.log(res.data.Result)
+            setAudioFileURL(res.data.Result);
+        });
+        setLoading(false);
+    }
+
+    //generate audio caption
+    const GenerateAudioCaption=async(FileURL)=>{
+        setLoading(true);
+        await axios.post('/api/generate-caption',{
+            audioFileURL:FileURL
+        }).there(resp=>{
+            console.log(resp.data.result);
+            setAudioCaption(resp?.data?.result);
+        })
+        setLoading(false);
+    }
+
     return (
         <div className='md:px-20'>
             <h2 className='text-4xl font-bold text-primary text-center'>Create New</h2>
